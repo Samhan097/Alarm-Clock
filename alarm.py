@@ -1,12 +1,18 @@
+from threading import Thread
 from tkinter.ttk import *
 from tkinter import *
 
 from PIL import ImageTk , Image
 
+from pygame import mixer
+
+from datetime import datetime
+from time import sleep
+
 # colors
 bg_color = '#ffffff'
 co1 = '#566FC6'
-co2 = '#000000'
+co2 = '#000000' 
 
 window = Tk()
 window.title("")
@@ -41,14 +47,14 @@ c_hour.place(x=130, y=58)
 min = Label(frame_body , text="min", height=1, font=('Ivy 10 bold'), bg=bg_color , fg=co1)
 min.place(x=177, y=40)
 c_min =Combobox(frame_body, width=2 , font=('arial 15'))
-c_min['values'] = ("00","01","02","03","04","05","06","07","08","09","10","11","12")
+c_min['values'] = ("00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60")
 c_min.current(0)
 c_min.place(x=180, y=58)
 
 sec = Label(frame_body , text="sec", height=1, font=('Ivy 10 bold'), bg=bg_color , fg=co1)
 sec.place(x=227, y=40)
 c_sec =Combobox(frame_body, width=2 , font=('arial 15'))
-c_sec['values'] = ("00","01","02","03","04","05","06","07","08","09","10","11","12")
+c_sec['values'] = ("00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60")
 c_sec.current(0)
 c_sec.place(x=230, y=58)
 
@@ -59,8 +65,54 @@ c_period['values'] = ("AM","PM")
 c_period.current(0)
 c_period.place(x=280, y=58)
 
+def activate_alarm():
+    t = Thread(target=alarm)
+    t.start()
+def deactivate_alarm():
+    print('Decativate', selected.get())
+    mixer.music.stop()
+
 selected = IntVar()
-red1 = Radiobutton(frame_body,text='Activate', font=('arial 10 bold'), value= 1)
+red1 = Radiobutton(frame_body,text='Activate', font=('arial 10 bold'), value= 1, command=activate_alarm , variable=selected)
 red1.place(x=125,y=95)
+
+def sound_alarm():
+    mixer.music.load('La Casa De Papel - Bella Ciao (Money Heist).mp3')
+    mixer.music.play()
+    selected.set(0)
+
+    red2 = Radiobutton(frame_body,text='Deactivate', font=('arial 10 bold'), value= 2, command=deactivate_alarm , variable=selected)
+    red2.place(x=187,y=95)
+
+def alarm():
+    while True:
+        control = selected.get()
+        print(control)
+
+        alarm_hour = c_hour.get()
+        alarm_minute = c_min.get()
+        alarm_sec = c_sec.get()
+        alarm_period = c_period.get()
+        alarm_period = str(alarm_period).upper()
+
+        now = datetime.now()
+        
+        hour = now.strftime("%I")
+        minute = now.strftime("%M")
+        second = now.strftime("%S")
+        period = now.strftime("%p")
+
+        if control == 1:
+            if alarm_period == period:
+                if alarm_hour == hour:
+                    if alarm_minute == minute: 
+                        if alarm_sec == second: 
+                            print("wake up man")
+                            sound_alarm()
+        
+        sleep(1)
+
+mixer.init()
+
 window.mainloop()
 
